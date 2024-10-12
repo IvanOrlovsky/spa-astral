@@ -1,0 +1,6 @@
+export enum Types {
+	AUTH_SUCCESS = "AUTH_SUCCESS",
+	AUTH_FAILURE = "AUTH_FAILURE",
+	LOGOUT = "LOGOUT",
+	SET_USER = "SET_USER",
+}
