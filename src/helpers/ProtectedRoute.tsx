@@ -1,20 +1,13 @@
 import React from "react";
 import { Navigate } from "react-router";
+import { useAppSelector } from "../hooks/hooks";
 
 export default function ProtectedRoute({
 	children,
-	accessToken,
 }: {
 	children: React.ReactNode;
-	accessToken: string | null;
 }) {
-	return (
-		<>
-			{accessToken === process.env.REACT_APP_ACCESS_TOKEN ? (
-				children
-			) : (
-				<Navigate to="/login" />
-			)}
-		</>
-	);
+	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
+	return <>{isLoggedIn ? children : <Navigate to="/login" />}</>;
 }

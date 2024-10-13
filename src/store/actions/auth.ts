@@ -4,6 +4,8 @@ import { actionType } from "../../types/action";
 import { Actions } from "./types";
 import axios from "axios";
 
+import Cookies from "js-cookie";
+
 export const login =
 	(login: string, password: string) =>
 	async (dipatch: Dispatch<actionType>) => {
@@ -16,9 +18,13 @@ export const login =
 					process.env.REACT_APP_LOGIN_API as string
 				);
 
+				Cookies.set("access_token", response.data.accessToken, {
+					path: "/",
+				});
+
 				return dipatch({
 					type: Actions.AUTH_SUCCESS,
-					payload: response.data,
+					payload: true,
 				});
 			} catch (err) {
 				return dipatch({
@@ -27,7 +33,7 @@ export const login =
 			}
 		}
 		return dipatch({
-			type: Actions.AUTH_FAILURE,
+			type: Actions.INVALID_CREDENTIALS,
 		});
 	};
 

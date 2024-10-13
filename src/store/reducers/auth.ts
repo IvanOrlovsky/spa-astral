@@ -2,11 +2,13 @@ import { actionType } from "../../types/action";
 import { Actions } from "../actions/types";
 
 export type authStateType = {
-	accessToken: string | null;
+	isLoggedIn: boolean;
+	errorMessage: string | null;
 };
 
 const defaultState: authStateType = {
-	accessToken: null,
+	isLoggedIn: false,
+	errorMessage: null,
 };
 
 export function authReducer(
@@ -17,17 +19,28 @@ export function authReducer(
 		case Actions.AUTH_SUCCESS:
 			return {
 				...state,
-				accessToken: action.payload,
+				isLoggedIn: true,
+			};
+		case Actions.INVALID_CREDENTIALS:
+			return {
+				...state,
+				errorMessage:
+					"Неверные данные для входа! Попробуйте логин: admin, пароль: admin",
 			};
 		case Actions.AUTH_FAILURE:
 			return {
 				...state,
-				accessToken: null,
+				errorMessage: "Произошла непредвиденная ошибка при входе!",
 			};
 		case Actions.LOGOUT:
 			return {
 				...state,
-				accessToken: null,
+				isLoggedIn: false,
+			};
+		case Actions.CLOSE_ALERT:
+			return {
+				...state,
+				errorMessage: null,
 			};
 		default:
 			return state;
