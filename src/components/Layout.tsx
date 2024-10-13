@@ -14,7 +14,7 @@ const Root = styled("div")(({ theme }) => ({
 const Main = styled("main")(({ theme }) => ({
 	flexGrow: 1,
 	padding: theme.spacing(3),
-	paddingTop: theme.spacing(10), // Adjust this value based on your header height
+	paddingTop: theme.spacing(10),
 }));
 
 interface LayoutProps {

@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import FacebookIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/X";
+import { NavLink } from "react-router-dom";
 
 function Copyright() {
 	return (
@@ -103,6 +104,7 @@ export default function Footer() {
 							</Stack>
 						</Box>
 					</Box>
+
 					<Box
 						sx={{
 							display: { xs: "none", sm: "flex" },
@@ -114,10 +116,15 @@ export default function Footer() {
 							variant="body2"
 							sx={{ fontWeight: "medium" }}
 						>
-							Профиль
+							Карточки
 						</Typography>
-						<Link color="text.secondary" variant="body2" href="#">
-							Профиль
+						<Link
+							component={NavLink}
+							to="/cards"
+							color="text.secondary"
+							variant="body2"
+						>
+							Карточки
 						</Link>
 					</Box>
 					<Box
@@ -131,10 +138,15 @@ export default function Footer() {
 							variant="body2"
 							sx={{ fontWeight: "medium" }}
 						>
-							Карточки
+							Профиль
 						</Typography>
-						<Link color="text.secondary" variant="body2" href="#">
-							Карточки
+						<Link
+							color="text.secondary"
+							variant="body2"
+							component={NavLink}
+							to="/profile"
+						>
+							Профиль
 						</Link>
 					</Box>
 				</Box>
