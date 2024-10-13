@@ -7,6 +7,19 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
+enum MotivationalPhrase {
+	WORD_OF_THE_DAY = "Word of the Day",
+	EXPAND_YOUR_VOCABULARY = "Expand Your Vocabulary",
+	LEARN_SOMETHING_NEW = "Learn Something New",
+	BOOST_YOUR_ENGLISH = "Boost Your English",
+	MASTER_NEW_WORDS = "Master New Words",
+	ELEVATE_YOUR_LANGUAGE = "Elevate Your Language",
+	WORD_POWER = "Word Power",
+	LINGUISTIC_CHALLENGE = "Linguistic Challenge",
+	VOCABULARY_BUILDER = "Vocabulary Builder",
+	LANGUAGE_EXPLORER = "Language Explorer",
+}
+
 interface WordCardProps {
 	word: string;
 	partOfSpeech: string;
