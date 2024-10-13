@@ -7,7 +7,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const login =
-	(login: string, password: string) =>
+	(login: string, password: string, remember: string | null) =>
 	async (dipatch: Dispatch<actionType>) => {
 		if (
 			login === process.env.REACT_APP_LOGIN &&
@@ -18,9 +18,20 @@ export const login =
 					process.env.REACT_APP_LOGIN_API as string
 				);
 
-				Cookies.set("access_token", response.data.accessToken, {
-					path: "/",
-				});
+				console.log(remember);
+
+				if (remember) {
+					Cookies.set("access_token", response.data.accessToken, {
+						path: "/",
+					});
+				} else {
+					sessionStorage.setItem(
+						"access_token",
+						response.data.accessToken
+					);
+				}
+
+				window.location.href = "/";
 
 				return dipatch({
 					type: Actions.AUTH_SUCCESS,

@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import { actionType } from "../../types/action";
 import { Actions } from "../actions/types";
 
@@ -7,7 +8,10 @@ export type authStateType = {
 };
 
 const defaultState: authStateType = {
-	isLoggedIn: false,
+	isLoggedIn:
+		!!Cookies.get("access_token") ||
+		!!sessionStorage.getItem("access_token") ||
+		false,
 	errorMessage: null,
 };
 

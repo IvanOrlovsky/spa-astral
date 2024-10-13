@@ -65,14 +65,11 @@ export default function Login() {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		console.log({
-			login: data.get("login"),
-			password: data.get("password"),
-		});
 		dispatch(
 			login(
 				data.get("login")?.toString() as string,
-				data.get("password")?.toString() as string
+				data.get("password")?.toString() as string,
+				data.get("remember")?.toString() as string
 			)
 		);
 	};
@@ -144,7 +141,7 @@ export default function Login() {
 						</FormControl>
 						<FormControlLabel
 							control={
-								<Checkbox value="remember" color="primary" />
+								<Checkbox name="remember" color="primary" />
 							}
 							label="Запомнить меня"
 						/>
