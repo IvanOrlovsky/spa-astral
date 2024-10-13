@@ -1,20 +1,30 @@
-import { actionType } from "../../types/actionType";
+import { actionType } from "../../types/action";
 import { Types } from "../actions/types";
 
-const defaultState = {
-	isLoggedIn: false,
-	user: null,
+const defaultState: {
+	accessToken: string | null;
+} = {
+	accessToken: null,
 };
 
 export function authReducer() {
 	return (state = defaultState, action: actionType) => {
 		switch (action.type) {
 			case Types.AUTH_SUCCESS:
-				return { ...state, isLoggedIn: true, user: action.payload };
+				return {
+					...state,
+					accessToken: action.payload,
+				};
 			case Types.AUTH_FAILURE:
-				return { ...state, isLoggedIn: false, user: null };
+				return {
+					...state,
+					accessToken: null,
+				};
 			case Types.LOGOUT:
-				return { ...state, isLoggedIn: false, user: null };
+				return {
+					...state,
+					accessToken: null,
+				};
 			default:
 				return state;
 		}
