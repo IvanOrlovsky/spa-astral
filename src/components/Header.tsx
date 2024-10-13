@@ -54,7 +54,20 @@ export default function Header() {
 							px: 0,
 						}}
 					>
-						<Box sx={{ display: { xs: "none", md: "flex" } }}>
+						<Box
+							sx={{
+								display: { xs: "none", md: "flex", gap: 12 },
+							}}
+						>
+							<Button
+								component={NavLink}
+								to="/"
+								variant="contained"
+								color="primary"
+								size="medium"
+							>
+								WordMaster
+							</Button>
 							<Button
 								component={NavLink}
 								to="/cards"
