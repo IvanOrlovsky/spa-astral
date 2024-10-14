@@ -26,8 +26,22 @@ function Copyright() {
 		</Typography>
 	);
 }
+interface Link {
+	label: string;
+	href: string;
+}
 
-export default function Footer() {
+interface FooterProps {
+	newsletterTitle: string;
+	newsletterDescription: string;
+	footerLinks: Link[];
+}
+
+export default function Footer({
+	newsletterTitle,
+	newsletterDescription,
+	footerLinks,
+}: FooterProps) {
 	return (
 		<React.Fragment>
 			<Divider />
@@ -37,7 +51,7 @@ export default function Footer() {
 					flexDirection: "column",
 					alignItems: "center",
 					gap: { xs: 4, sm: 8 },
-					py: { xs: 8, sm: 10 },
+					py: { xs: 2, sm: 3 },
 					textAlign: { sm: "center", md: "left" },
 				}}
 			>
@@ -63,14 +77,13 @@ export default function Footer() {
 								gutterBottom
 								sx={{ fontWeight: 600, mt: 2 }}
 							>
-								Присоединитесь к нашей рассылке!
+								{newsletterTitle}
 							</Typography>
 							<Typography
 								variant="body2"
 								sx={{ color: "text.secondary", mb: 2 }}
 							>
-								Подпишитесь на нашу еженедельную рассылку
-								новостей из мира анлийского языка
+								{newsletterDescription}
 							</Typography>
 							<InputLabel htmlFor="email-newsletter">
 								Ваша электронная почта
@@ -112,44 +125,20 @@ export default function Footer() {
 							gap: 1,
 						}}
 					>
-						<Typography
-							variant="body2"
-							sx={{ fontWeight: "medium" }}
-						>
-							Карточки
-						</Typography>
-						<Link
-							component={NavLink}
-							to="/cards"
-							color="text.secondary"
-							variant="body2"
-						>
-							Карточки
-						</Link>
-					</Box>
-					<Box
-						sx={{
-							display: { xs: "none", sm: "flex" },
-							flexDirection: "column",
-							gap: 1,
-						}}
-					>
-						<Typography
-							variant="body2"
-							sx={{ fontWeight: "medium" }}
-						>
-							Профиль
-						</Typography>
-						<Link
-							color="text.secondary"
-							variant="body2"
-							component={NavLink}
-							to="/profile"
-						>
-							Профиль
-						</Link>
+						{footerLinks?.map((link, index) => (
+							<Link
+								key={index}
+								component={NavLink}
+								to={link.href}
+								color="text.secondary"
+								variant="body2"
+							>
+								{link.label}
+							</Link>
+						))}
 					</Box>
 				</Box>
+
 				<Box
 					sx={{
 						display: "flex",

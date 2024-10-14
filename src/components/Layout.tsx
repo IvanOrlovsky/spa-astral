@@ -30,7 +30,14 @@ export default function Layout({ children }: LayoutProps) {
 					<Box sx={{ my: 4 }}>{children}</Box>
 				</Container>
 			</Main>
-			<Footer />
+			<Footer
+				newsletterTitle="Подпишитесь на нашу рассылку новостей из мира изучения анлийского языка!"
+				newsletterDescription="Так, вы всегда будете знать самую актуальную информацию"
+				footerLinks={[
+					{ href: "/cards", label: "Карточки" },
+					{ href: "/profile", label: "Профиль" },
+				]}
+			/>
 		</Root>
 	);
 }
