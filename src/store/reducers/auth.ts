@@ -4,7 +4,6 @@ import { Actions } from "../actions/types";
 
 export type authStateType = {
 	isLoggedIn: boolean;
-	errorMessage: string | null;
 };
 
 const defaultState: authStateType = {
@@ -12,7 +11,6 @@ const defaultState: authStateType = {
 		!!Cookies.get("access_token") ||
 		!!sessionStorage.getItem("access_token") ||
 		false,
-	errorMessage: null,
 };
 
 export function authReducer(
@@ -25,26 +23,10 @@ export function authReducer(
 				...state,
 				isLoggedIn: true,
 			};
-		case Actions.INVALID_CREDENTIALS:
-			return {
-				...state,
-				errorMessage:
-					"Неверные данные для входа! Попробуйте логин: admin, пароль: admin",
-			};
-		case Actions.AUTH_FAILURE:
-			return {
-				...state,
-				errorMessage: "Произошла непредвиденная ошибка при входе!",
-			};
 		case Actions.LOGOUT:
 			return {
 				...state,
 				isLoggedIn: false,
-			};
-		case Actions.CLOSE_ALERT:
-			return {
-				...state,
-				errorMessage: null,
 			};
 		default:
 			return state;

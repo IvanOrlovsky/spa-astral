@@ -23,7 +23,11 @@ export const getCards = () => async (dipatch: Dispatch<actionType>) => {
 		});
 	} catch (err) {
 		return dipatch({
-			type: Actions.GET_CARDS_FAILURE,
+			type: Actions.OPEN_ALERT,
+			payload: {
+				message:
+					"Произошла непредвиденная ошибка при получении карточек!",
+			},
 		});
 	}
 };
