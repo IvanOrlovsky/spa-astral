@@ -23,6 +23,14 @@ export const updateUser =
 				throw new Error();
 			}
 
+			dispatch({
+				type: Actions.OPEN_ALERT,
+				payload: {
+					message: "Новые данные успешно сохранены!",
+					severity: "success",
+				},
+			});
+
 			return dispatch({
 				type: Actions.UPDATE_USER,
 				payload: newUserData,
@@ -42,3 +50,21 @@ export const setUser = (user: userType) => ({
 	type: Actions.SET_USER,
 	payload: user,
 });
+
+export const getUser = () => async (dispatch: Dispatch<actionType>) => {
+	const userResponse = await axios.get(
+		process.env.REACT_APP_SET_USER_API as string,
+		{
+			headers: {
+				Authorization:
+					Cookies.get("access_token") ||
+					sessionStorage.getItem("access_token"),
+			},
+		}
+	);
+
+	return dispatch({
+		type: Actions.SET_USER,
+		payload: userResponse.data,
+	});
+};
