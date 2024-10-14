@@ -1,4 +1,4 @@
-export type WordCard = {
+export type WordCardType = {
 	word: string;
 	partOfSpeech: string;
 	definition: string;
