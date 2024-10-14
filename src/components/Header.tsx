@@ -13,6 +13,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import { NavLink } from "react-router-dom";
+import { useAppDispatch } from "../hooks/hooks";
+import { logout } from "../store/actions/auth";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 	display: "flex",
@@ -33,6 +35,12 @@ export default function Header() {
 
 	const toggleDrawer = (newOpen: boolean) => () => {
 		setOpen(newOpen);
+	};
+
+	const dispatch = useAppDispatch();
+
+	const handleLogout = () => {
+		dispatch(logout());
 	};
 
 	return (
@@ -99,6 +107,7 @@ export default function Header() {
 							color="primary"
 							variant="contained"
 							size="small"
+							onClick={handleLogout}
 						>
 							Выйти
 						</Button>

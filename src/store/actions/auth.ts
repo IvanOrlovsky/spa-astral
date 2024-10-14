@@ -48,4 +48,16 @@ export const login =
 		});
 	};
 
-export const logout = () => {};
+export const logout = () => {
+	if (!!Cookies.get("access_token")) {
+		Cookies.remove("access_token");
+	}
+
+	if (!!sessionStorage.getItem("access_token")) {
+		sessionStorage.removeItem("access_token");
+	}
+
+	return {
+		type: Actions.LOGOUT,
+	};
+};
