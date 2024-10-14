@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
+import Box, { BoxProps } from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -31,27 +31,28 @@ interface WordCardProps {
 
 const StyledCard = styled(Card)(() => ({
 	position: "relative",
-	transition: "transform 0.6s",
-	transformStyle: "preserve-3d",
 	width: 275,
 	height: 300,
+	transformStyle: "preserve-3d",
+	transition: "transform 0.8s",
 }));
 
 const CardSide = styled(Box)(() => ({
 	position: "absolute",
 	width: "100%",
 	height: "100%",
-	backfaceVisibility: "hidden",
 	display: "flex",
 	flexDirection: "column",
 	justifyContent: "space-between",
 }));
 
+const CardFront = styled(CardSide)(() => ({
+	backgroundColor: "white",
+}));
+
 const CardBack = styled(CardSide)(() => ({
-	transform: "rotateY(180deg)",
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "center",
+	backgroundColor: "lightgray",
+	transform: "rotateY(180deg)", // Вращаем заднюю сторону на 180 градусов
 }));
 
 export default function WordCard({
@@ -79,15 +80,20 @@ export default function WordCard({
 	return (
 		<Box
 			sx={{
-				perspective: "1000px",
+				perspective: "1000px", // Устанавливаем перспективу
 			}}
 		>
 			<StyledCard
 				sx={{
-					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)", // Вращаем карточку в зависимости от состояния
 				}}
 			>
-				<CardSide>
+				{/* Передняя сторона */}
+				<CardFront
+					sx={{
+						backfaceVisibility: isFlipped ? "hidden" : "visible",
+					}}
+				>
 					<CardContent>
 						<Typography
 							sx={{ fontSize: 14 }}
@@ -110,11 +116,17 @@ export default function WordCard({
 					</CardContent>
 					<CardActions>
 						<Button size="small" onClick={handleFlip}>
-							Learn More
+							Узнать перевод
 						</Button>
 					</CardActions>
-				</CardSide>
-				<CardBack>
+				</CardFront>
+
+				{/* Обратная сторона */}
+				<CardBack
+					sx={{
+						backfaceVisibility: !isFlipped ? "hidden" : "visible",
+					}}
+				>
 					<CardContent>
 						<Typography variant="h5" component="div" gutterBottom>
 							Перевод
