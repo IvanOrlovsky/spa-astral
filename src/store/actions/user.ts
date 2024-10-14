@@ -3,11 +3,12 @@ import { actionType } from "../../types/action";
 import axios from "axios";
 import { Actions } from "./types";
 import Cookies from "js-cookie";
+import { userType } from "../../types/user";
 
-export const setUser = () => async (dipatch: Dispatch<actionType>) => {
+export const getUser = () => async (dispatch: Dispatch<actionType>) => {
 	try {
 		const response = await axios.get(
-			process.env.REACT_APP_USER_API as string,
+			process.env.REACT_APP_GET_USER_API as string,
 			{
 				headers: {
 					Authorization:
@@ -17,12 +18,12 @@ export const setUser = () => async (dipatch: Dispatch<actionType>) => {
 			}
 		);
 
-		return dipatch({
-			type: Actions.SET_USER,
+		return dispatch({
+			type: Actions.GET_USER,
 			payload: response.data.cards,
 		});
 	} catch (err) {
-		return dipatch({
+		return dispatch({
 			type: Actions.OPEN_ALERT,
 			payload: {
 				errorMessage:
@@ -31,3 +32,36 @@ export const setUser = () => async (dipatch: Dispatch<actionType>) => {
 		});
 	}
 };
+
+export const setUser =
+	(user: userType) => async (dispatch: Dispatch<actionType>) => {
+		try {
+			const response = await axios.post(
+				process.env.REACT_APP_SET_USER_API as string,
+				{
+					headers: {
+						Authorization:
+							Cookies.get("access_token") ||
+							localStorage.getItem("access_token"),
+					},
+				}
+			);
+
+			if (response.data.message !== "Success") {
+				throw new Error();
+			}
+
+			return dispatch({
+				type: Actions.SET_USER,
+				payload: user,
+			});
+		} catch (err) {
+			return dispatch({
+				type: Actions.OPEN_ALERT,
+				payload: {
+					errorMessage:
+						"Произошла непредвиденная ошибка при изменении данных пользователя!",
+				},
+			});
+		}
+	};

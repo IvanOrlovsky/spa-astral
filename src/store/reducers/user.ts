@@ -15,6 +15,11 @@ export function userReducer(
 	action: actionType
 ): userStateType {
 	switch (action.type) {
+		case Actions.GET_USER:
+			return {
+				...state,
+				user: action.payload,
+			};
 		case Actions.SET_USER:
 			return {
 				...state,
