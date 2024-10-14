@@ -13,8 +13,7 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 
 import { login } from "../store/actions/auth";
-import { useAppDispatch, useAppSelector } from "../hooks/hooks";
-import AlertMessage from "../components/AlertMessage";
+import { useAppDispatch } from "../hooks/hooks";
 
 const Card = styled(MuiCard)(({ theme }) => ({
 	display: "flex",
@@ -60,8 +59,6 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 export default function Login() {
 	const dispatch = useAppDispatch();
 
-	const errorMessage = useAppSelector((state) => state.auth.errorMessage);
-
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
@@ -76,11 +73,6 @@ export default function Login() {
 
 	return (
 		<>
-			<AlertMessage
-				isOpen={!!errorMessage}
-				message={errorMessage || ""}
-				severity="error"
-			/>
 			<CssBaseline enableColorScheme />
 			<SignInContainer direction="column" justifyContent="space-between">
 				<Card variant="outlined">
