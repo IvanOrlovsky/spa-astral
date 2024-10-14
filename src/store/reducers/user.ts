@@ -15,12 +15,13 @@ export function userReducer(
 	action: actionType
 ): userStateType {
 	switch (action.type) {
-		case Actions.GET_USER:
+		case Actions.UPDATE_USER:
 			return {
 				...state,
 				user: action.payload,
 			};
 		case Actions.SET_USER:
+			console.log("User payload:", action.payload);
 			return {
 				...state,
 				user: action.payload,
