@@ -31,18 +31,33 @@ export const login =
 
 				window.location.href = "/";
 
+				dipatch({
+					type: Actions.OPEN_ALERT,
+					payload: {
+						message: "Вход выполнен успешно!",
+						severity: "success",
+					},
+				});
+
 				return dipatch({
 					type: Actions.AUTH_SUCCESS,
 					payload: true,
 				});
 			} catch (err) {
 				return dipatch({
-					type: Actions.AUTH_FAILURE,
+					type: Actions.OPEN_ALERT,
+					payload: {
+						message: "Произошла непредвиденная ошибка при входе!",
+					},
 				});
 			}
 		}
 		return dipatch({
-			type: Actions.INVALID_CREDENTIALS,
+			type: Actions.OPEN_ALERT,
+			payload: {
+				message:
+					"Неверные данные для входа! Попробуйте логин: admin, пароль: admin",
+			},
 		});
 	};
 
