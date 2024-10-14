@@ -1,13 +1,15 @@
 import React from "react";
 import { Navigate } from "react-router";
-import { useAppSelector } from "../hooks/hooks";
 
+interface ProtectedRouteProps {
+	children: React.ReactNode;
+	redirectTo: string;
+	isProtected: boolean;
+}
 export default function ProtectedRoute({
 	children,
-}: {
-	children: React.ReactNode;
-}) {
-	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
-
-	return <>{isLoggedIn ? children : <Navigate to="/login" />}</>;
+	redirectTo,
+	isProtected,
+}: ProtectedRouteProps) {
+	return <>{isProtected ? children : <Navigate to={redirectTo} />}</>;
 }

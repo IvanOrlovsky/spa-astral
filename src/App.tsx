@@ -12,6 +12,7 @@ import AlertMessage from "./components/AlertMessage";
 const App = () => {
 	const message = useAppSelector((state) => state.alert.message);
 	const severity = useAppSelector((state) => state.alert.severity);
+	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
 	return (
 		<>
@@ -21,11 +22,24 @@ const App = () => {
 				severity={severity || null}
 			/>
 			<Routes>
-				<Route path="/login" element={<Login />} />
+				<Route
+					path="/login"
+					element={
+						<ProtectedRoute
+							redirectTo="/"
+							isProtected={!isLoggedIn}
+						>
+							<Login />
+						</ProtectedRoute>
+					}
+				/>
 				<Route
 					path="/"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute
+							redirectTo="/login"
+							isProtected={isLoggedIn}
+						>
 							<Home />
 						</ProtectedRoute>
 					}
@@ -33,7 +47,10 @@ const App = () => {
 				<Route
 					path="/cards"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute
+							redirectTo="/login"
+							isProtected={isLoggedIn}
+						>
 							<Cards />
 						</ProtectedRoute>
 					}
@@ -41,7 +58,10 @@ const App = () => {
 				<Route
 					path="/profile"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute
+							redirectTo="/login"
+							isProtected={isLoggedIn}
+						>
 							<Profile />
 						</ProtectedRoute>
 					}
