@@ -18,8 +18,6 @@ export const login =
 					process.env.REACT_APP_LOGIN_API as string
 				);
 
-				console.log(remember);
-
 				if (remember) {
 					Cookies.set("access_token", response.data.accessToken, {
 						path: "/",
