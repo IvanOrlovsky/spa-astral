@@ -5,44 +5,16 @@ import { Actions } from "./types";
 import Cookies from "js-cookie";
 import { userType } from "../../types/user";
 
-export const getUser = () => async (dispatch: Dispatch<actionType>) => {
-	try {
-		const response = await axios.get(
-			process.env.REACT_APP_GET_USER_API as string,
-			{
-				headers: {
-					Authorization:
-						Cookies.get("access_token") ||
-						localStorage.getItem("access_token"),
-				},
-			}
-		);
-
-		return dispatch({
-			type: Actions.GET_USER,
-			payload: response.data.cards,
-		});
-	} catch (err) {
-		return dispatch({
-			type: Actions.OPEN_ALERT,
-			payload: {
-				errorMessage:
-					"Произошла непредвиденная ошибка при получении данных пользователя!",
-			},
-		});
-	}
-};
-
-export const setUser =
-	(user: userType) => async (dispatch: Dispatch<actionType>) => {
+export const updateUser =
+	(newUserData: userType) => async (dispatch: Dispatch<actionType>) => {
 		try {
 			const response = await axios.post(
-				process.env.REACT_APP_SET_USER_API as string,
+				process.env.REACT_APP_UPDATE_USER_API as string,
 				{
 					headers: {
 						Authorization:
 							Cookies.get("access_token") ||
-							localStorage.getItem("access_token"),
+							sessionStorage.getItem("access_token"),
 					},
 				}
 			);
@@ -52,16 +24,21 @@ export const setUser =
 			}
 
 			return dispatch({
-				type: Actions.SET_USER,
-				payload: user,
+				type: Actions.UPDATE_USER,
+				payload: newUserData,
 			});
 		} catch (err) {
 			return dispatch({
 				type: Actions.OPEN_ALERT,
 				payload: {
-					errorMessage:
-						"Произошла непредвиденная ошибка при изменении данных пользователя!",
+					message:
+						"Произошла непредвиденная ошибка при получении данных пользователя!",
 				},
 			});
 		}
 	};
+
+export const setUser = (user: userType) => ({
+	type: Actions.SET_USER,
+	payload: user,
+});
