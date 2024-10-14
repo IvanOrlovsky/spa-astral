@@ -1,11 +1,10 @@
-import Grid from "@mui/material/Grid2";
-
 import Layout from "../components/Layout";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { useEffect } from "react";
 import { getCards } from "../store/actions/cards";
-
-import WordCard from "../components/WordCard";
+import Box from "@mui/material/Box";
+import { CircularProgress, Typography } from "@mui/material";
+import CardList from "../components/CardList";
 
 export default function Cards() {
 	const dispatch = useAppDispatch();
@@ -16,19 +15,27 @@ export default function Cards() {
 		dispatch(getCards());
 	}, []);
 
+	if (cards.length === 0) {
+		return (
+			<Box
+				sx={{
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					flexDirection: "column",
+					height: "100vh",
+					backgroundColor: "white",
+				}}
+			>
+				<CircularProgress size="3rem" />
+				<Typography>Совсем скоро загрузятся карточки!!!</Typography>
+			</Box>
+		);
+	}
+
 	return (
 		<Layout>
-			<Grid
-				container
-				spacing={{ xs: 2, md: 3 }}
-				columns={{ xs: 4, sm: 8, md: 12 }}
-			>
-				{cards.map((card, index) => (
-					<Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-						<WordCard {...card} />
-					</Grid>
-				))}
-			</Grid>
+			<CardList cards={cards} />
 		</Layout>
 	);
 }

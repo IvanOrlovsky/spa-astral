@@ -1,9 +1,9 @@
 import { actionType } from "../../types/action";
 import { Actions } from "../actions/types";
-import { WordCard } from "../../types/wordcard";
+import { WordCardType } from "../../types/wordcard";
 
 export type cardsStateType = {
-	cards: WordCard[];
+	cards: WordCardType[];
 };
 
 const defaultState: cardsStateType = {
