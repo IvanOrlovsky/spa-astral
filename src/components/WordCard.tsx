@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { styled } from "@mui/material/styles";
-import Box, { BoxProps } from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { getRandomInt } from "../helpers/utils";
 
 const MotivationalPhrases = {
@@ -29,32 +24,14 @@ interface WordCardProps {
 	translation: string;
 }
 
-const StyledCard = styled(Card)(() => ({
-	position: "relative",
-	width: 275,
-	height: 300,
-	transformStyle: "preserve-3d",
-	transition: "transform 0.8s",
-}));
-
-const CardSide = styled(Box)(() => ({
-	position: "absolute",
-	width: "100%",
-	height: "100%",
-	display: "flex",
-	flexDirection: "column",
-	justifyContent: "space-between",
-}));
-
-const CardFront = styled(CardSide)(() => ({
-	backgroundColor: "white",
-}));
-
-const CardBack = styled(CardSide)(() => ({
-	backgroundColor: "lightgray",
-	transform: "rotateY(180deg)", // Вращаем заднюю сторону на 180 градусов
-}));
-
+/*
+Наверное стоит прояснить
+Тут я использовал, так сказать, синергию div и MUI-компонентов, потому 
+что если строить карточку через Box и styled components, то внутренние
+стили MUI препятствуют нормально отображению анимации, в частности, 
+как бы я не старался, видна только одна часть карточки(задняя или передняя)
+Поэтому вот так вот.
+*/
 export default function WordCard({
 	word,
 	partOfSpeech,
@@ -63,12 +40,8 @@ export default function WordCard({
 	translation,
 }: WordCardProps) {
 	const [isFlipped, setIsFlipped] = useState(false);
-
-	const handleFlip = () => {
-		setIsFlipped(!isFlipped);
-	};
-
 	const [motivationPhrase, setMotivationPhrase] = useState("");
+
 	useEffect(() => {
 		setMotivationPhrase(
 			Object.values(MotivationalPhrases)[
@@ -77,24 +50,48 @@ export default function WordCard({
 		);
 	}, []);
 
+	const handleFlip = () => {
+		setIsFlipped(!isFlipped);
+	};
+
 	return (
-		<Box
-			sx={{
-				perspective: "1000px", // Устанавливаем перспективу
+		<div
+			style={{
+				position: "relative",
+				width: "275px",
+				height: "300px",
+				perspective: "1000px",
 			}}
 		>
-			<StyledCard
-				sx={{
-					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)", // Вращаем карточку в зависимости от состояния
+			<div
+				style={{
+					width: "100%",
+					height: "100%",
+					transformStyle: "preserve-3d",
+					transition: "transform 0.8s ease",
+					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+					position: "relative",
+					borderRadius: "16px",
+					boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+					padding: 4,
 				}}
 			>
-				{/* Передняя сторона */}
-				<CardFront
-					sx={{
-						backfaceVisibility: isFlipped ? "hidden" : "visible",
+				{/* Лицевая сторона */}
+				<div
+					style={{
+						position: "absolute",
+						width: "100%",
+						height: "100%",
+						backfaceVisibility: "hidden",
+						backgroundColor: "white",
+						transform: "rotateY(0deg)",
+						borderRadius: "16px",
+						display: "flex",
+						flexDirection: "column",
+						justifyContent: "space-between",
 					}}
 				>
-					<CardContent>
+					<div style={{ padding: "16px" }}>
 						<Typography
 							sx={{ fontSize: 14 }}
 							color="text.secondary"
@@ -113,33 +110,50 @@ export default function WordCard({
 							<br />
 							{example}
 						</Typography>
-					</CardContent>
-					<CardActions>
-						<Button size="small" onClick={handleFlip}>
+					</div>
+					<div style={{ padding: "16px", textAlign: "center" }}>
+						<Button
+							variant="contained"
+							onClick={handleFlip}
+							sx={{ width: "100%", backgroundColor: "#1976d2" }}
+						>
 							Узнать перевод
 						</Button>
-					</CardActions>
-				</CardFront>
+					</div>
+				</div>
 
 				{/* Обратная сторона */}
-				<CardBack
-					sx={{
-						backfaceVisibility: !isFlipped ? "hidden" : "visible",
+				<div
+					style={{
+						position: "absolute",
+						width: "100%",
+						height: "100%",
+						backfaceVisibility: "hidden",
+						backgroundColor: "#f5f5f5",
+						transform: "rotateY(180deg)",
+						borderRadius: "16px",
+						display: "flex",
+						flexDirection: "column",
+						justifyContent: "space-between",
 					}}
 				>
-					<CardContent>
-						<Typography variant="h5" component="div" gutterBottom>
+					<div style={{ padding: "16px" }}>
+						<Typography variant="h5" component="div">
 							Перевод
 						</Typography>
 						<Typography variant="body1">{translation}</Typography>
-					</CardContent>
-					<CardActions>
-						<Button size="small" onClick={handleFlip}>
+					</div>
+					<div style={{ padding: "16px", textAlign: "center" }}>
+						<Button
+							variant="contained"
+							onClick={handleFlip}
+							sx={{ width: "100%", backgroundColor: "#1976d2" }}
+						>
 							Вернуться
 						</Button>
-					</CardActions>
-				</CardBack>
-			</StyledCard>
-		</Box>
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 }
