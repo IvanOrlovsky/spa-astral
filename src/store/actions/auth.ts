@@ -5,10 +5,11 @@ import { Actions } from "./types";
 import axios from "axios";
 
 import Cookies from "js-cookie";
+import { setUser } from "./user";
 
 export const login =
 	(login: string, password: string, remember: string | null) =>
-	async (dipatch: Dispatch<actionType>) => {
+	async (dispatch: Dispatch<actionType>) => {
 		if (
 			login === process.env.REACT_APP_LOGIN &&
 			password === process.env.REACT_APP_PASSWORD
@@ -29,9 +30,7 @@ export const login =
 					);
 				}
 
-				window.location.href = "/";
-
-				dipatch({
+				dispatch({
 					type: Actions.OPEN_ALERT,
 					payload: {
 						message: "Вход выполнен успешно!",
@@ -39,12 +38,26 @@ export const login =
 					},
 				});
 
-				return dipatch({
+				const userResponse = await axios.get(
+					process.env.REACT_APP_SET_USER_API as string,
+					{
+						headers: {
+							Authorization:
+								Cookies.get("access_token") ||
+								sessionStorage.getItem("access_token"),
+						},
+					}
+				);
+
+				dispatch(setUser(userResponse.data));
+
+				return dispatch({
 					type: Actions.AUTH_SUCCESS,
 					payload: true,
 				});
 			} catch (err) {
-				return dipatch({
+				console.error(err);
+				return dispatch({
 					type: Actions.OPEN_ALERT,
 					payload: {
 						message: "Произошла непредвиденная ошибка при входе!",
@@ -52,7 +65,7 @@ export const login =
 				});
 			}
 		}
-		return dipatch({
+		return dispatch({
 			type: Actions.OPEN_ALERT,
 			payload: {
 				message:
