@@ -7,40 +7,47 @@ import Cards from "./pages/Cards";
 
 import ProtectedRoute from "./helpers/ProtectedRoute";
 import { useAppSelector } from "./hooks/hooks";
+import AlertMessage from "./components/AlertMessage";
 
 const App = () => {
-	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+	const message = useAppSelector((state) => state.alert.message);
+	const severity = useAppSelector((state) => state.alert.severity);
 
-	
-	
 	return (
-		<Routes>
-			<Route path="/login" element={<Login />} />
-			<Route
-				path="/"
-				element={
-					<ProtectedRoute>
-						<Home />
-					</ProtectedRoute>
-				}
+		<>
+			<AlertMessage
+				isOpen={!!message}
+				message={message || ""}
+				severity={severity || null}
 			/>
-			<Route
-				path="/cards"
-				element={
-					<ProtectedRoute>
-						<Cards />
-					</ProtectedRoute>
-				}
-			/>
-			<Route
-				path="/profile"
-				element={
-					<ProtectedRoute>
-						<Profile />
-					</ProtectedRoute>
-				}
-			/>
-		</Routes>
+			<Routes>
+				<Route path="/login" element={<Login />} />
+				<Route
+					path="/"
+					element={
+						<ProtectedRoute>
+							<Home />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/cards"
+					element={
+						<ProtectedRoute>
+							<Cards />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/profile"
+					element={
+						<ProtectedRoute>
+							<Profile />
+						</ProtectedRoute>
+					}
+				/>
+			</Routes>
+		</>
 	);
 };
 
