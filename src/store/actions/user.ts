@@ -68,3 +68,7 @@ export const getUser = () => async (dispatch: Dispatch<actionType>) => {
 		payload: userResponse.data,
 	});
 };
+
+export const deleteUser = () => ({
+	type: Actions.DELETE_USER,
+});

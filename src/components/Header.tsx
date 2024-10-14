@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { logout } from "../store/actions/auth";
 import { useNavigate } from "react-router-dom";
 import { Actions } from "../store/actions/types";
+import { deleteUser } from "../store/actions/user";
 
 interface HeaderProps {
 	logoText: string;
@@ -49,6 +50,7 @@ export default function Header({ logoText, username }: HeaderProps) {
 	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
 	const handleLogout = () => {
+		dispatch(deleteUser());
 		dispatch(logout());
 	};
 

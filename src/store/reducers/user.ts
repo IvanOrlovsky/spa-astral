@@ -21,10 +21,14 @@ export function userReducer(
 				user: action.payload,
 			};
 		case Actions.SET_USER:
-			console.log("User payload:", action.payload);
 			return {
 				...state,
 				user: action.payload,
+			};
+		case Actions.DELETE_USER:
+			return {
+				...state,
+				user: null,
 			};
 
 		default:
