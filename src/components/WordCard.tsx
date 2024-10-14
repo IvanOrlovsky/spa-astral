@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -6,19 +6,20 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { getRandomInt } from "../helpers/utils";
 
-enum MotivationalPhrase {
-	WORD_OF_THE_DAY = "Word of the Day",
-	EXPAND_YOUR_VOCABULARY = "Expand Your Vocabulary",
-	LEARN_SOMETHING_NEW = "Learn Something New",
-	BOOST_YOUR_ENGLISH = "Boost Your English",
-	MASTER_NEW_WORDS = "Master New Words",
-	ELEVATE_YOUR_LANGUAGE = "Elevate Your Language",
-	WORD_POWER = "Word Power",
-	LINGUISTIC_CHALLENGE = "Linguistic Challenge",
-	VOCABULARY_BUILDER = "Vocabulary Builder",
-	LANGUAGE_EXPLORER = "Language Explorer",
-}
+const MotivationalPhrases = {
+	WORD_OF_THE_DAY: "Word of the Day",
+	EXPAND_YOUR_VOCABULARY: "Expand Your Vocabulary",
+	LEARN_SOMETHING_NEW: "Learn Something New",
+	BOOST_YOUR_ENGLISH: "Boost Your English",
+	MASTER_NEW_WORDS: "Master New Words",
+	ELEVATE_YOUR_LANGUAGE: "Elevate Your Language",
+	WORD_POWER: "Word Power",
+	LINGUISTIC_CHALLENGE: "Linguistic Challenge",
+	VOCABULARY_BUILDER: "Vocabulary Builder",
+	LANGUAGE_EXPLORER: "Language Explorer",
+};
 
 interface WordCardProps {
 	word: string;
@@ -66,26 +67,19 @@ export default function WordCard({
 		setIsFlipped(!isFlipped);
 	};
 
-	const bull = (
-		<Box
-			component="span"
-			sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
-		>
-			•
-		</Box>
-	);
+	const [motivationPhrase, setMotivationPhrase] = useState("");
+	useEffect(() => {
+		setMotivationPhrase(
+			Object.values(MotivationalPhrases)[
+				getRandomInt(0, Object.values(MotivationalPhrases).length - 1)
+			]
+		);
+	}, []);
 
 	return (
 		<Box
 			sx={{
 				perspective: "1000px",
-				"&:hover": {
-					"& > div": {
-						transform: isFlipped
-							? "rotateY(0deg)"
-							: "rotateY(180deg)",
-					},
-				},
 			}}
 		>
 			<StyledCard
@@ -100,15 +94,10 @@ export default function WordCard({
 							color="text.secondary"
 							gutterBottom
 						>
-							Word of the Day
+							{motivationPhrase}
 						</Typography>
 						<Typography variant="h5" component="div">
-							{word.split("").map((char, index) => (
-								<React.Fragment key={index}>
-									{char}
-									{index !== word.length - 1 && bull}
-								</React.Fragment>
-							))}
+							{word}
 						</Typography>
 						<Typography sx={{ mb: 1.5 }} color="text.secondary">
 							{partOfSpeech}
