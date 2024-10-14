@@ -16,6 +16,11 @@ import { NavLink } from "react-router-dom";
 import { useAppDispatch } from "../hooks/hooks";
 import { logout } from "../store/actions/auth";
 
+interface HeaderProps {
+	logoText: string;
+	username: string;
+}
+
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 	display: "flex",
 	alignItems: "center",
@@ -30,7 +35,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 	padding: "8px 12px",
 }));
 
-export default function Header() {
+export default function Header({ logoText, username }: HeaderProps) {
 	const [open, setOpen] = React.useState(false);
 
 	const toggleDrawer = (newOpen: boolean) => () => {
@@ -74,7 +79,7 @@ export default function Header() {
 								color="primary"
 								size="medium"
 							>
-								WordMaster
+								{logoText}
 							</Button>
 							<Button
 								component={NavLink}
@@ -92,7 +97,7 @@ export default function Header() {
 								color="info"
 								size="small"
 							>
-								Профиль
+								Ваш профиль, {username}
 							</Button>
 						</Box>
 					</Box>

@@ -4,6 +4,7 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useAppSelector } from "../hooks/hooks";
 
 const Root = styled("div")(({ theme }) => ({
 	display: "flex",
@@ -22,9 +23,10 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+	const username = useAppSelector((state) => state.user.user?.nickname);
 	return (
 		<Root>
-			<Header />
+			<Header username={username as string} logoText="WordMaster" />
 			<Main>
 				<Container maxWidth="lg">
 					<Box sx={{ my: 4 }}>{children}</Box>
