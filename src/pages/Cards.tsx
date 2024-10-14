@@ -5,6 +5,7 @@ import { getCards } from "../store/actions/cards";
 import Box from "@mui/material/Box";
 import { CircularProgress, Typography } from "@mui/material";
 import CardList from "../components/CardList";
+import Loading from "../helpers/Loading";
 
 export default function Cards() {
 	const dispatch = useAppDispatch();
@@ -16,21 +17,7 @@ export default function Cards() {
 	}, []);
 
 	if (cards.length === 0) {
-		return (
-			<Box
-				sx={{
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-					flexDirection: "column",
-					height: "100vh",
-					backgroundColor: "white",
-				}}
-			>
-				<CircularProgress size="3rem" />
-				<Typography>Совсем скоро загрузятся карточки!!!</Typography>
-			</Box>
-		);
+		return <Loading text="Совсем скоро загрузятся карточки!!!" />;
 	}
 
 	return (
