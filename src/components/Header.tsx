@@ -13,8 +13,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import { NavLink } from "react-router-dom";
-import { useAppDispatch } from "../hooks/hooks";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { logout } from "../store/actions/auth";
+import { useNavigate } from "react-router-dom";
+import { Actions } from "../store/actions/types";
 
 interface HeaderProps {
 	logoText: string;
@@ -44,8 +46,16 @@ export default function Header({ logoText, username }: HeaderProps) {
 
 	const dispatch = useAppDispatch();
 
+	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
 	const handleLogout = () => {
 		dispatch(logout());
+	};
+
+	const navigate = useNavigate();
+
+	const handleLogin = () => {
+		navigate("/login");
 	};
 
 	return (
@@ -97,7 +107,7 @@ export default function Header({ logoText, username }: HeaderProps) {
 								color="info"
 								size="small"
 							>
-								Ваш профиль, {username}
+								Ваш профиль, {username || "Незнакомец"}
 							</Button>
 						</Box>
 					</Box>
@@ -108,14 +118,25 @@ export default function Header({ logoText, username }: HeaderProps) {
 							alignItems: "center",
 						}}
 					>
-						<Button
-							color="primary"
-							variant="contained"
-							size="small"
-							onClick={handleLogout}
-						>
-							Выйти
-						</Button>
+						{isLoggedIn ? (
+							<Button
+								color="primary"
+								variant="contained"
+								size="small"
+								onClick={handleLogout}
+							>
+								Выйти
+							</Button>
+						) : (
+							<Button
+								color="primary"
+								variant="contained"
+								size="small"
+								onClick={handleLogin}
+							>
+								Войти в учетную запись
+							</Button>
+						)}
 					</Box>
 					<Box sx={{ display: { sm: "flex", md: "none" } }}>
 						<IconButton
@@ -154,13 +175,25 @@ export default function Header({ logoText, username }: HeaderProps) {
 									Профиль
 								</MenuItem>
 								<MenuItem>
-									<Button
-										color="primary"
-										variant="contained"
-										fullWidth
-									>
-										Выйти
-									</Button>
+									{isLoggedIn ? (
+										<Button
+											color="primary"
+											variant="contained"
+											fullWidth
+											onClick={handleLogout}
+										>
+											Выйти
+										</Button>
+									) : (
+										<Button
+											color="primary"
+											variant="contained"
+											fullWidth
+											onClick={handleLogout}
+										>
+											Войти в учетную запись
+										</Button>
+									)}
 								</MenuItem>
 							</Box>
 						</Drawer>

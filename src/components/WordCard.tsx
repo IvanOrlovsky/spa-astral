@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { getRandomInt } from "../helpers/utils";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import { Actions } from "../store/actions/types";
 
 const MotivationalPhrases = {
 	WORD_OF_THE_DAY: "Word of the Day",
@@ -42,6 +44,9 @@ export default function WordCard({
 	const [isFlipped, setIsFlipped] = useState(false);
 	const [motivationPhrase, setMotivationPhrase] = useState("");
 
+	const dispatch = useAppDispatch();
+	const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
 	useEffect(() => {
 		setMotivationPhrase(
 			Object.values(MotivationalPhrases)[
@@ -51,6 +56,16 @@ export default function WordCard({
 	}, []);
 
 	const handleFlip = () => {
+		if (!isLoggedIn) {
+			dispatch({
+				type: Actions.OPEN_ALERT,
+				payload: {
+					message:
+						"Посмотреть перевод можно только авторизированным пользователям!",
+				},
+			});
+			return;
+		}
 		setIsFlipped(!isFlipped);
 	};
 

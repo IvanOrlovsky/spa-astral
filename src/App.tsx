@@ -33,28 +33,8 @@ const App = () => {
 						</ProtectedRoute>
 					}
 				/>
-				<Route
-					path="/"
-					element={
-						<ProtectedRoute
-							redirectTo="/login"
-							isProtected={isLoggedIn}
-						>
-							<Home />
-						</ProtectedRoute>
-					}
-				/>
-				<Route
-					path="/cards"
-					element={
-						<ProtectedRoute
-							redirectTo="/login"
-							isProtected={isLoggedIn}
-						>
-							<Cards />
-						</ProtectedRoute>
-					}
-				/>
+				<Route path="/" element={<Home />} />
+				<Route path="/cards" element={<Cards />} />
 				<Route
 					path="/profile"
 					element={

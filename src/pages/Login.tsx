@@ -14,6 +14,7 @@ import { styled } from "@mui/material/styles";
 
 import { login } from "../store/actions/auth";
 import { useAppDispatch } from "../hooks/hooks";
+import { NavLink } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
 	display: "flex",
@@ -139,6 +140,16 @@ export default function Login() {
 						/>
 						<Button type="submit" fullWidth variant="contained">
 							Войти
+						</Button>
+						<Button
+							type="button"
+							component={NavLink}
+							to="/"
+							variant="outlined"
+							color="primary"
+							size="medium"
+						>
+							Вернуться на главную страницу
 						</Button>
 					</Box>
 				</Card>
