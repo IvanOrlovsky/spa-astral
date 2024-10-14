@@ -12,7 +12,7 @@ export const getCards = () => async (dipatch: Dispatch<actionType>) => {
 				headers: {
 					Authorization:
 						Cookies.get("access_token") ||
-						localStorage.getItem("access_token"),
+						sessionStorage.getItem("access_token"),
 				},
 			}
 		);
