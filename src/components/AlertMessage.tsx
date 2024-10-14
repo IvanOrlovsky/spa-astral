@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 import { useAppDispatch } from "../hooks/hooks";
+import { closeAlert } from "../store/actions/alert";
 
 export default function AlertMessage({
 	isOpen,
@@ -11,9 +12,13 @@ export default function AlertMessage({
 	message,
 }: {
 	isOpen: boolean;
-	severity: "error" | "warning" | "info" | "success";
+	severity?: "error" | "warning" | "info" | "success" | null | undefined;
 	message: string;
 }) {
+	if (!severity) {
+		severity = "error";
+	}
+
 	const dispatch = useAppDispatch();
 
 	const handleClose = (
@@ -23,7 +28,7 @@ export default function AlertMessage({
 		if (reason === "clickaway") {
 			return;
 		}
-		dispatch({ type: "CLOSE_ALERT" });
+		dispatch(closeAlert());
 	};
 
 	return (
