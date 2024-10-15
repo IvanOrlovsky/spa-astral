@@ -77,11 +77,9 @@ jobs:
 
             - name: Stop and remove existing container
               run: |
-                  # Get list of containers
                   containers=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/containers/json" \
                     -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}")
 
-                  # Find container ID for our app
                   container_id=$(echo $containers | jq -r '.[] | select(.Image | contains("${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}")) | .Id')
 
                   if [ -n "$container_id" ]; then
@@ -111,26 +109,53 @@ jobs:
                     echo "No old image found to remove."
                   fi
 
-            - name: Update and redeploy stack
-              run: |
-                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ steps.get_stack_id.outputs.stack_id }}/update?endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
-                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" \
-                    -H "Content-Type: application/json" \
-                    -d '{
-                      "prune": true,
-                      "pullImage": true,
-                      "env": [
-                        {"name": "REACT_APP_LOGIN", "value": "${{ secrets.REACT_APP_LOGIN }}"},
-                        {"name": "REACT_APP_PASSWORD", "value": "${{ secrets.REACT_APP_PASSWORD }}"},
-                        {"name": "REACT_APP_LOGIN_API", "value": "${{ secrets.REACT_APP_LOGIN_API }}"},
-                        {"name": "REACT_APP_ACCESS_TOKEN", "value": "${{ secrets.REACT_APP_ACCESS_TOKEN }}"},
-                        {"name": "REACT_APP_CARDS_API", "value": "${{ secrets.REACT_APP_CARDS_API }}"},
-                        {"name": "REACT_APP_SET_USER_API", "value": "${{ secrets.REACT_APP_SET_USER_API }}"},
-                        {"name": "REACT_APP_GET_USER_API", "value": "${{ secrets.REACT_APP_GET_USER_API }}"}
-                      ]
-                    }'
-
             - name: Force pull new image
               run: |
                   curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/images/create?fromImage=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest&force=true" \
                     -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}"
+
+            - name: Update stack
+              run: |
+                  stack_file_content=$(cat << EOF
+                  version: '3'
+                  services:
+                    app:
+                      image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest
+                      ports:
+                        - '8080:80'
+                      environment:
+                        - REACT_APP_LOGIN=${{ secrets.REACT_APP_LOGIN }}
+                        - REACT_APP_PASSWORD=${{ secrets.REACT_APP_PASSWORD }}
+                        - REACT_APP_LOGIN_API=${{ secrets.REACT_APP_LOGIN_API }}
+                        - REACT_APP_ACCESS_TOKEN=${{ secrets.REACT_APP_ACCESS_TOKEN }}
+                        - REACT_APP_CARDS_API=${{ secrets.REACT_APP_CARDS_API }}
+                        - REACT_APP_SET_USER_API=${{ secrets.REACT_APP_SET_USER_API }}
+                        - REACT_APP_GET_USER_API=${{ secrets.REACT_APP_GET_USER_API }}
+                  EOF
+                  )
+
+                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ steps.get_stack_id.outputs.stack_id }}?endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                      "stackFileContent": "'"${stack_file_content//$'\n'/\\n}"'",
+                      "prune": true,
+                      "pullImage": true
+                    }'
+
+            - name: Verify deployment
+              run: |
+                  echo "Waiting for the new container to start..."
+                  sleep 5
+
+                  containers=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/containers/json" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}")
+
+                  new_container_id=$(echo $containers | jq -r '.[] | select(.Image | contains("${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}")) | .Id')
+
+                  if [ -n "$new_container_id" ]; then
+                    echo "New container is running with ID: $new_container_id"
+                  else
+                    echo "Error: New container not found. Deployment may have failed."
+                    exit 1
+                  fi
