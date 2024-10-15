@@ -184,7 +184,7 @@ export default function Header({ logoText, username }: HeaderProps) {
 											fullWidth
 											onClick={handleLogout}
 										>
-											Выйти
+											Выйти из учетной записи
 										</Button>
 									) : (
 										<Button
