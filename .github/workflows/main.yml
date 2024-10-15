@@ -8,7 +8,6 @@ on:
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
-
         steps:
             - name: Checkout repository
               uses: actions/checkout@v2
@@ -38,7 +37,6 @@ jobs:
     deploy:
         needs: build-and-push
         runs-on: ubuntu-latest
-
         steps:
             - name: Get Portainer auth token
               id: get_token
@@ -51,53 +49,47 @@ jobs:
                     echo "Failed to get auth token"
                     exit 1
                   fi
-                  echo "token=$token" >> $GITHUB_ENV
+                  echo "token=$token" >> $GITHUB_OUTPUT
 
             - name: Get Portainer endpoint ID
               id: get_endpoint
               run: |
                   endpoint_response=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints" \
-                    -H "Authorization: Bearer ${{ env.token }}")
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}")
                   endpoint_id=$(echo $endpoint_response | jq -r '.[0].Id')
                   if [ -z "$endpoint_id" ] || [ "$endpoint_id" == "null" ]; then
                     echo "Failed to get endpoint ID"
                     exit 1
                   fi
-                  echo "endpoint_id=$endpoint_id" >> $GITHUB_ENV
+                  echo "endpoint_id=$endpoint_id" >> $GITHUB_OUTPUT
 
             - name: Get existing stack ID
               id: get_stack_id
               run: |
                   existing_stack_response=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/stacks" \
-                    -H "Authorization: Bearer ${{ env.token }}")
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}")
                   stack_id=$(echo $existing_stack_response | jq -r '.[] | select(.Name=="spa-astral") | .Id')
                   if [ -z "$stack_id" ]; then
                     echo "Stack not found"
                     exit 1
                   fi
-                  echo "stack_id=$stack_id" >> $GITHUB_ENV
+                  echo "stack_id=$stack_id" >> $GITHUB_OUTPUT
 
-            - name: Remove old image from Portainer
+            - name: Update and redeploy stack
               run: |
-                  old_images=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/images/json" \
-                    -H "Authorization: Bearer ${{ env.token }}" | jq -r '.[] | select(.RepoTags[] | contains("'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest")).Id')
-
-                  if [ -n "$old_images" ]; then
-                    for image_id in $old_images; do
-                      curl -X DELETE "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/images/$image_id?force=true" \
-                        -H "Authorization: Bearer ${{ env.token }}"
-                      echo "Removed old image $image_id."
-                    done
-                  else
-                    echo "No old images found."
-                  fi
-
-            - name: Deploy to Portainer
-              run: |
-                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ env.stack_id }}?method=string&type=2&endpointId=${{ env.endpoint_id }}&recreate=2" \
-                    -H "Authorization: Bearer ${{ env.token }}" \
+                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ steps.get_stack_id.outputs.stack_id }}?endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" \
                     -H "Content-Type: application/json" \
                     -d '{
-                      "name": "spa-astral",
-                      "stackFileContent": "version: '\''3'\''\nservices:\n  app:\n    image: \"'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'\"\n    ports:\n      - '\''8080:80'\''\n    environment:\n      - REACT_APP_LOGIN=\"${{ secrets.REACT_APP_LOGIN }}\"\n      - REACT_APP_PASSWORD=\"${{ secrets.REACT_APP_PASSWORD }}\"\n      - REACT_APP_LOGIN_API=\"${{ secrets.REACT_APP_LOGIN_API }}\"\n      - REACT_APP_ACCESS_TOKEN=\"${{ secrets.REACT_APP_ACCESS_TOKEN }}\"\n      - REACT_APP_CARDS_API=\"${{ secrets.REACT_APP_CARDS_API }}\"\n      - REACT_APP_SET_USER_API=\"${{ secrets.REACT_APP_SET_USER_API }}\"\n      - REACT_APP_GET_USER_API=\"${{ secrets.REACT_APP_GET_USER_API }}\""
+                      "prune": true,
+                      "pullImage": true,
+                      "env": [
+                        {"name": "REACT_APP_LOGIN", "value": "${{ secrets.REACT_APP_LOGIN }}"},
+                        {"name": "REACT_APP_PASSWORD", "value": "${{ secrets.REACT_APP_PASSWORD }}"},
+                        {"name": "REACT_APP_LOGIN_API", "value": "${{ secrets.REACT_APP_LOGIN_API }}"},
+                        {"name": "REACT_APP_ACCESS_TOKEN", "value": "${{ secrets.REACT_APP_ACCESS_TOKEN }}"},
+                        {"name": "REACT_APP_CARDS_API", "value": "${{ secrets.REACT_APP_CARDS_API }}"},
+                        {"name": "REACT_APP_SET_USER_API", "value": "${{ secrets.REACT_APP_SET_USER_API }}"},
+                        {"name": "REACT_APP_GET_USER_API", "value": "${{ secrets.REACT_APP_GET_USER_API }}"}
+                      ]
                     }'
