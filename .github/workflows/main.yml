@@ -25,6 +25,7 @@ jobs:
                   context: .
                   push: true
                   tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest
+                  no-cache: true
                   build-args: |
                       REACT_APP_LOGIN=${{ secrets.REACT_APP_LOGIN }}
                       REACT_APP_PASSWORD=${{ secrets.REACT_APP_PASSWORD }}
