@@ -78,7 +78,7 @@ jobs:
 
             - name: Deploy to Portainer
               run: |
-                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ env.stack_id }}?method=string&type=2&endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
+                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ env.stack_id }}?method=string&type=2&endpointId=${{ env.endpoint_id }}" \
                     -H "Authorization: Bearer ${{ env.token }}" \
                     -H "Content-Type: application/json" \
                     -d '{
