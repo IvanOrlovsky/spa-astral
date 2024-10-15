@@ -34,6 +34,7 @@ jobs:
                       REACT_APP_CARDS_API=${{ secrets.REACT_APP_CARDS_API }}
                       REACT_APP_GET_USER_API=${{ secrets.REACT_APP_GET_USER_API }}
                       REACT_APP_SET_USER_API=${{ secrets.REACT_APP_SET_USER_API }}
+
     deploy:
         needs: build-and-push
         runs-on: ubuntu-latest
@@ -76,6 +77,21 @@ jobs:
                   fi
                   echo "stack_id=$stack_id" >> $GITHUB_ENV
 
+            - name: Remove old image from Portainer
+              run: |
+                  old_images=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/images/json" \
+                    -H "Authorization: Bearer ${{ env.token }}" | jq -r '.[] | select(.RepoTags[] | contains("'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest")).Id')
+
+                  if [ -n "$old_images" ]; then
+                    for image_id in $old_images; do
+                      curl -X DELETE "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/images/$image_id?force=true" \
+                        -H "Authorization: Bearer ${{ env.token }}"
+                      echo "Removed old image $image_id."
+                    done
+                  else
+                    echo "No old images found."
+                  fi
+
             - name: Deploy to Portainer
               run: |
                   curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ env.stack_id }}?method=string&type=2&endpointId=${{ env.endpoint_id }}&recreate=2" \
@@ -85,16 +101,3 @@ jobs:
                       "name": "spa-astral",
                       "stackFileContent": "version: '\''3'\''\nservices:\n  app:\n    image: \"'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'\"\n    ports:\n      - '\''8080:80'\''\n    environment:\n      - REACT_APP_LOGIN=\"${{ secrets.REACT_APP_LOGIN }}\"\n      - REACT_APP_PASSWORD=\"${{ secrets.REACT_APP_PASSWORD }}\"\n      - REACT_APP_LOGIN_API=\"${{ secrets.REACT_APP_LOGIN_API }}\"\n      - REACT_APP_ACCESS_TOKEN=\"${{ secrets.REACT_APP_ACCESS_TOKEN }}\"\n      - REACT_APP_CARDS_API=\"${{ secrets.REACT_APP_CARDS_API }}\"\n      - REACT_APP_SET_USER_API=\"${{ secrets.REACT_APP_SET_USER_API }}\"\n      - REACT_APP_GET_USER_API=\"${{ secrets.REACT_APP_GET_USER_API }}\""
                     }'
-            - name: Restart container
-              run: |
-                  container_id=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/containers/json" \
-                    -H "Authorization: Bearer ${{ env.token }}" | jq -r '.[] | select(.Image=="'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'").Id')
-
-                  if [ -z "$container_id" ]; then
-                    echo "Container not found"
-                    exit 1
-                  fi
-
-                  # Перезапускаем контейнер
-                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/containers/$container_id/restart" \
-                    -H "Authorization: Bearer ${{ env.token }}"
