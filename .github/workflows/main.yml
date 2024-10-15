@@ -75,6 +75,27 @@ jobs:
                   fi
                   echo "stack_id=$stack_id" >> $GITHUB_OUTPUT
 
+            - name: Stop and remove existing container
+              run: |
+                  # Get list of containers
+                  containers=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/containers/json" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}")
+
+                  # Find container ID for our app
+                  container_id=$(echo $containers | jq -r '.[] | select(.Image | contains("${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}")) | .Id')
+
+                  if [ -n "$container_id" ]; then
+                    echo "Stopping container: $container_id"
+                    curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/containers/$container_id/stop" \
+                      -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}"
+                    
+                    echo "Removing container: $container_id"
+                    curl -X DELETE "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/containers/$container_id" \
+                      -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}"
+                  else
+                    echo "No existing container found."
+                  fi
+
             - name: Remove old image
               run: |
                   image_name="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest"
