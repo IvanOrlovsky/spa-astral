@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
 		<Layout>
 			<Box sx={{ my: 4 }}>
 				<Typography variant="h3" component="h1" gutterBottom>
-					Добро пожаловать в WordMaster
+					Добро пожаловать в WordMaster!
 				</Typography>
 				<Typography variant="h5" sx={{ mb: 4 }}>
 					Ваш путь к свободному владению английским языком начинается
