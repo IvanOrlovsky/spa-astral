@@ -25,13 +25,51 @@ jobs:
                   context: .
                   push: true
                   tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest
+                  build-args: |
+                      REACT_APP_LOGIN=${{ secrets.REACT_APP_LOGIN }}
+                      REACT_APP_PASSWORD=${{ secrets.REACT_APP_PASSWORD }}
+                      REACT_APP_LOGIN_API=${{ secrets.REACT_APP_LOGIN_API }}
+                      REACT_APP_ACCESS_TOKEN=${{ secrets.REACT_APP_ACCESS_TOKEN }}
+                      REACT_APP_CARDS_API=${{ secrets.REACT_APP_CARDS_API }}
+                      REACT_APP_UPDATE_USER_API=${{ secrets.REACT_APP_UPDATE_USER_API }}
+                      REACT_APP_SET_USER_API=${{ secrets.REACT_APP_SET_USER_API }}
+
+    deploy:
+        needs: build-and-push
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Get Portainer Auth Token
+              id: get-portainer-token
+              run: |
+                  response=$(curl -s -X POST "${{ secrets.PORTAINER_HOST }}/api/auth" \
+                            -H "Content-Type: application/json" \
+                            -d "{\"username\": \"${{ secrets.PORTAINER_USERNAME }}\", \"password\": \"${{ secrets.PORTAINER_PASSWORD }}\"}")
+                  token=$(echo $response | jq -r .jwt)
+                  echo "TOKEN=$token" >> $GITHUB_ENV
+
+            - name: Get Endpoint ID
+              id: get-endpoint-id
+              run: |
+                  response=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints" \
+                            -H "Authorization: Bearer ${{ env.TOKEN }}")
+                  endpoint_id=$(echo $response | jq -r '.[0].Id')
+                  echo "ENDPOINT_ID=$endpoint_id" >> $GITHUB_ENV
 
             - name: Deploy to Portainer
               env:
-                  PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+                  PORTAINER_TOKEN: ${{ env.TOKEN }}
                   PORTAINER_HOST: ${{ secrets.PORTAINER_HOST }}
+                  ENDPOINT_ID: ${{ env.ENDPOINT_ID }}
               run: |
-                  curl -X POST "${PORTAINER_HOST}/api/stacks" \
-                       -H "Authorization: Bearer ${PORTAINER_API_KEY}" \
+                  curl -X POST "${PORTAINER_HOST}/api/endpoints/${ENDPOINT_ID}/stacks" \
+                       -H "Authorization: Bearer ${PORTAINER_TOKEN}" \
                        -H "Content-Type: application/json" \
-                       --data-binary @stack-definition.json
+                       --data-binary @- <<EOF
+                  {
+                    "Name": "spa-astral-app",
+                    "StackFileContent": "version: '3.1'\nservices:\n  web:\n    image: '${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'\n    ports:\n      - '80:80'\n",
+                    "EndpointId": ${ENDPOINT_ID},
+                    "Prune": true
+                  }
+                  EOF
