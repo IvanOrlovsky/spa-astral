@@ -66,10 +66,10 @@ jobs:
 
             - name: Deploy to Portainer
               run: |
-                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/stacks?method=string&type=2&endpointId=${{ env.endpoint_id }}" \
+                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/stacks?method=string&type=2&endpointId=2" \
                     -H "Authorization: Bearer ${{ env.token }}" \
                     -H "Content-Type: application/json" \
                     -d '{
                       "name": "spa-astral",
-                      "stackFileContent": "version: '\''3'\''\nservices:\n  app:\n    image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest\n    ports:\n      - '\''80:80'\''"
+                      "stackFileContent": "version: '\''3'\''\nservices:\n  app:\n    image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest\n    ports:\n      - '\''8080:80'\''"
                     }'
