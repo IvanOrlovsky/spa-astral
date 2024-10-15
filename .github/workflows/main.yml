@@ -64,9 +64,21 @@ jobs:
                   fi
                   echo "endpoint_id=$endpoint_id" >> $GITHUB_ENV
 
+            - name: Get existing stack ID
+              id: get_stack_id
+              run: |
+                  existing_stack_response=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/stacks" \
+                    -H "Authorization: Bearer ${{ env.token }}")
+                  stack_id=$(echo $existing_stack_response | jq -r '.[] | select(.Name=="spa-astral") | .Id')
+                  if [ -z "$stack_id" ]; then
+                    echo "Stack not found"
+                    exit 1
+                  fi
+                  echo "stack_id=$stack_id" >> $GITHUB_ENV
+
             - name: Deploy to Portainer
               run: |
-                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/stacks?method=string&type=2&endpointId=2" \
+                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ env.stack_id }}?method=string&type=2&endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
                     -H "Authorization: Bearer ${{ env.token }}" \
                     -H "Content-Type: application/json" \
                     -d '{
