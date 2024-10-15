@@ -4,7 +4,8 @@ WORKDIR /app
 
 # Копируем package.json и устанавливаем зависимости
 COPY package*.json ./
-RUN npm install
+RUN npm install -g pnpm
+RUN pnpm install
 
 # Копируем все файлы приложения
 COPY . .
@@ -19,7 +20,7 @@ ARG REACT_APP_GET_USER_API
 ARG REACT_APP_SET_USER_API
 
 # Сборка приложения
-RUN npm run build
+RUN pnpm run build
 
 # Этап сборки образа на базе Nginx для сервировки приложения
 FROM nginx:alpine
