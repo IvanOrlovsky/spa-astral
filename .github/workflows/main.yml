@@ -84,3 +84,16 @@ jobs:
                       "name": "spa-astral",
                       "stackFileContent": "version: '\''3'\''\nservices:\n  app:\n    image: \"'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'\"\n    ports:\n      - '\''8080:80'\''\n    environment:\n      - REACT_APP_LOGIN=\"${{ secrets.REACT_APP_LOGIN }}\"\n      - REACT_APP_PASSWORD=\"${{ secrets.REACT_APP_PASSWORD }}\"\n      - REACT_APP_LOGIN_API=\"${{ secrets.REACT_APP_LOGIN_API }}\"\n      - REACT_APP_ACCESS_TOKEN=\"${{ secrets.REACT_APP_ACCESS_TOKEN }}\"\n      - REACT_APP_CARDS_API=\"${{ secrets.REACT_APP_CARDS_API }}\"\n      - REACT_APP_SET_USER_API=\"${{ secrets.REACT_APP_SET_USER_API }}\"\n      - REACT_APP_GET_USER_API=\"${{ secrets.REACT_APP_GET_USER_API }}\""
                     }'
+            - name: Restart container
+              run: |
+                  container_id=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/containers/json" \
+                    -H "Authorization: Bearer ${{ env.token }}" | jq -r '.[] | select(.Image=="'${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'").Id')
+
+                  if [ -z "$container_id" ]; then
+                    echo "Container not found"
+                    exit 1
+                  fi
+
+                  # Перезапускаем контейнер
+                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/docker/containers/$container_id/restart" \
+                    -H "Authorization: Bearer ${{ env.token }}"
