@@ -54,8 +54,7 @@ export const setUser = (user: userType) => ({
 
 export const getUser = () => async (dispatch: Dispatch<actionType>) => {
 	const userResponse = await axios.get(
-		process.env.REACT_APP_SET_USER_API ||
-			"https://demo6972685.mockable.io/user",
+		process.env.REACT_APP_SET_USER_API as string,
 		{
 			headers: {
 				Authorization:
