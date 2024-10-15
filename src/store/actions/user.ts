@@ -9,7 +9,8 @@ export const updateUser =
 	(newUserData: userType) => async (dispatch: Dispatch<actionType>) => {
 		try {
 			const response = await axios.post(
-				process.env.REACT_APP_UPDATE_USER_API as string,
+				process.env.REACT_APP_UPDATE_USER_API ||
+					"https://demo6972685.mockable.io/user",
 				{
 					headers: {
 						Authorization:
@@ -53,7 +54,8 @@ export const setUser = (user: userType) => ({
 
 export const getUser = () => async (dispatch: Dispatch<actionType>) => {
 	const userResponse = await axios.get(
-		process.env.REACT_APP_SET_USER_API as string,
+		process.env.REACT_APP_SET_USER_API ||
+			"https://demo6972685.mockable.io/user",
 		{
 			headers: {
 				Authorization:

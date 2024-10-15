@@ -7,7 +7,8 @@ import Cookies from "js-cookie";
 export const getCards = () => async (dipatch: Dispatch<actionType>) => {
 	try {
 		const response = await axios.get(
-			process.env.REACT_APP_CARDS_API as string,
+			process.env.REACT_APP_CARDS_API ||
+				"https://demo6972685.mockable.io/cards",
 			{
 				headers: {
 					Authorization:
