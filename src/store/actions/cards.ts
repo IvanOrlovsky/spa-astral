@@ -22,6 +22,7 @@ export const getCards = () => async (dipatch: Dispatch<actionType>) => {
 			payload: response.data.cards,
 		});
 	} catch (err) {
+		console.error(err);
 		return dipatch({
 			type: Actions.OPEN_ALERT,
 			payload: {
