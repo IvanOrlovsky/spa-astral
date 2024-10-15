@@ -75,9 +75,24 @@ jobs:
                   fi
                   echo "stack_id=$stack_id" >> $GITHUB_OUTPUT
 
+            - name: Remove old image
+              run: |
+                  image_name="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest"
+                  old_image_id=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/images/json" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" | \
+                    jq -r --arg NAME "$image_name" '.[] | select(.RepoTags[] | contains($NAME)) | .Id')
+
+                  if [ -n "$old_image_id" ]; then
+                    echo "Removing old image: $old_image_id"
+                    curl -X DELETE "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/images/$old_image_id?force=true" \
+                      -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}"
+                  else
+                    echo "No old image found to remove."
+                  fi
+
             - name: Update and redeploy stack
               run: |
-                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ steps.get_stack_id.outputs.stack_id }}?endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
+                  curl -X PUT "${{ secrets.PORTAINER_HOST }}/api/stacks/${{ steps.get_stack_id.outputs.stack_id }}/update?endpointId=${{ steps.get_endpoint.outputs.endpoint_id }}" \
                     -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}" \
                     -H "Content-Type: application/json" \
                     -d '{
@@ -93,3 +108,8 @@ jobs:
                         {"name": "REACT_APP_GET_USER_API", "value": "${{ secrets.REACT_APP_GET_USER_API }}"}
                       ]
                     }'
+
+            - name: Force pull new image
+              run: |
+                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ steps.get_endpoint.outputs.endpoint_id }}/docker/images/create?fromImage=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest&force=true" \
+                    -H "Authorization: Bearer ${{ steps.get_token.outputs.token }}"
