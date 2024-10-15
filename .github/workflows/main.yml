@@ -45,25 +45,32 @@ jobs:
                   response=$(curl -s -X POST "${{ secrets.PORTAINER_HOST }}/api/auth" \
                     -H "Content-Type: application/json" \
                     -d '{"username": "${{ secrets.PORTAINER_USERNAME }}", "password": "${{ secrets.PORTAINER_PASSWORD }}"}')
-                  echo "token=$(echo $response | jq -r '.jwt')" >> $GITHUB_ENV
+                  token=$(echo $response | jq -r '.jwt')
+                  if [ -z "$token" ] || [ "$token" == "null" ]; then
+                    echo "Failed to get auth token"
+                    exit 1
+                  fi
+                  echo "token=$token" >> $GITHUB_ENV
 
             - name: Get Portainer endpoint ID
               id: get_endpoint
               run: |
                   endpoint_response=$(curl -s -X GET "${{ secrets.PORTAINER_HOST }}/api/endpoints" \
                     -H "Authorization: Bearer ${{ env.token }}")
-                  echo "endpoint_id=$(echo $endpoint_response | jq '.[0].Id')" >> $GITHUB_ENV
+                  endpoint_id=$(echo $endpoint_response | jq -r '.[0].Id')
+                  if [ -z "$endpoint_id" ] || [ "$endpoint_id" == "null" ]; then
+                    echo "Failed to get endpoint ID"
+                    exit 1
+                  fi
+                  echo "endpoint_id=$endpoint_id" >> $GITHUB_ENV
 
             - name: Deploy to Portainer
               run: |
-                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/endpoints/${{ env.endpoint_id }}/stacks" \
+                  curl -X POST "${{ secrets.PORTAINER_HOST }}/api/stacks" \
                     -H "Authorization: Bearer ${{ env.token }}" \
                     -H "Content-Type: application/json" \
-                    --data-binary @- <<EOF
-                  {
-                    "Name": "spa-astral-app",
-                    "StackFileContent": "version: '3.1'\nservices:\n  web:\n    image: '${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest'\n    ports:\n      - '80:80'\n",
-                    "EndpointId": ${{ env.endpoint_id }},
-                    "Prune": true
-                  }
-                  EOF
+                    -d '{
+                      "name": "spa-astral",
+                      "endpointId": ${{ env.endpoint_id }},
+                      "stackFileContent": "version: '3'\nservices:\n  app:\n    image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest\n    ports:\n      - '80:80'"
+                    }'
