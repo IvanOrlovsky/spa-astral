@@ -31,9 +31,8 @@ jobs:
                       REACT_APP_LOGIN_API=${{ secrets.REACT_APP_LOGIN_API }}
                       REACT_APP_ACCESS_TOKEN=${{ secrets.REACT_APP_ACCESS_TOKEN }}
                       REACT_APP_CARDS_API=${{ secrets.REACT_APP_CARDS_API }}
-                      REACT_APP_UPDATE_USER_API=${{ secrets.REACT_APP_UPDATE_USER_API }}
+                      REACT_APP_GET_USER_API=${{ secrets.REACT_APP_GET_USER_API }}
                       REACT_APP_SET_USER_API=${{ secrets.REACT_APP_SET_USER_API }}
-
     deploy:
         needs: build-and-push
         runs-on: ubuntu-latest
